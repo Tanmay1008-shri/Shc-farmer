@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#FAFBFF"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="SHC Assistant"/>
+<meta name="description" content="SHC Farmer Registration & Plot Assistant"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png"/>
+<title>SHC Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#FAFBFF;--bg2:#F0F4FF;--bg3:#E8EEFF;
+  --white:#FFFFFF;--border:#E2E8F8;--border2:#C7D2FE;
+  --text:#1E2340;--text2:#5A6480;--text3:#9CA3C0;
+  --blue:#4F7FFA;--violet:#7C5CF6;--blue-l:#EEF2FF;
+  --green:#059669;--teal:#0D9488;--green-l:#ECFDF5;
+  --rose:#E11D48;--rose-l:#FFF1F2;
+  --r:16px;--r2:12px;
+  --shadow:0 2px 16px rgba(79,127,250,.08);
+  --shadow2:0 6px 24px rgba(79,127,250,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif;overscroll-behavior:none;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;min-height:100vh;min-height:100dvh;}
+.screen.active{display:flex;}
+
+/* ── SPLASH ── */
+#s-splash{background:linear-gradient(160deg,#2952C8 0%,#4F7FFA 50%,#7C5CF6 100%);align-items:center;justify-content:center;}
+.spl-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;animation:splIn .65s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes splIn{from{opacity:0;transform:scale(.75) translateY(24px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.spl-ico{width:104px;height:104px;background:rgba(255,255,255,.18);border-radius:32px;display:flex;align-items:center;justify-content:center;font-size:54px;border:2px solid rgba(255,255,255,.3);box-shadow:0 8px 40px rgba(0,0,0,.25);}
+.spl-title{font-family:'Nunito',sans-serif;font-size:32px;font-weight:900;color:#fff;letter-spacing:-.5px;text-align:center;}
+.spl-sub{font-size:14px;color:rgba(255,255,255,.72);font-weight:500;text-align:center;line-height:1.5;}
+.spl-dots{display:flex;gap:7px;margin-top:4px;}
+.spl-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);}
+.spl-dot:nth-child(1){animation:dp 1.2s 0s infinite;}
+.spl-dot:nth-child(2){animation:dp 1.2s .22s infinite;}
+.spl-dot:nth-child(3){animation:dp 1.2s .44s infinite;}
+@keyframes dp{0%,80%,100%{background:rgba(255,255,255,.3)}40%{background:rgba(255,255,255,.95)}}
+
+/* ── HEADER ── */
+.header{background:var(--white);border-bottom:1.5px solid var(--border);padding:13px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;}
+.hdr-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.hdr-ico.blue{background:linear-gradient(135deg,var(--blue),var(--violet));}
+.hdr-ico.green{background:linear-gradient(135deg,var(--green),var(--teal));}
+.hdr-title{font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--text);line-height:1.15;}
+.hdr-sub{font-size:11.5px;color:var(--text2);font-weight:500;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.hdr-badge{background:var(--bg2);border-radius:20px;padding:4px 11px;font-size:12px;font-weight:700;color:var(--blue);}
+.back-btn{display:flex;align-items:center;gap:4px;background:var(--bg2);border:none;border-radius:20px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;}
+.back-btn:active{background:var(--bg3);}
+
+/* ── HOME ── */
+.home-body{flex:1;padding:20px 18px;overflow-y:auto;}
+.home-greet-title{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--text);margin-bottom:4px;}
+.home-greet-sub{font-size:13.5px;color:var(--text2);font-weight:500;line-height:1.55;margin-bottom:24px;}
+.mod-cards{display:flex;flex-direction:column;gap:14px;}
+.mod-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:20px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.mod-card:active{transform:scale(.985);box-shadow:none;}
+.mod-card::after{content:'';position:absolute;top:-30px;right:-30px;width:130px;height:130px;border-radius:50%;opacity:.06;}
+.mod-card.ca::after{background:var(--blue);}
+.mod-card.cb::after{background:var(--green);}
+.mc-top{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;}
+.mc-ico{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.mc-ico.a{background:linear-gradient(135deg,#EEF2FF,#DDE8FF);}
+.mc-ico.b{background:linear-gradient(135deg,var(--green-l),#D1FAE5);}
+.mc-info .mc-title{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:var(--text);margin-bottom:4px;}
+.mc-info .mc-desc{font-size:13px;color:var(--text2);line-height:1.55;font-weight:500;}
+.mc-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.mc-tag{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.mc-tag.a{background:var(--blue-l);color:var(--blue);}
+.mc-tag.b{background:var(--green-l);color:var(--green);}
+.mc-arr{position:absolute;bottom:20px;right:20px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.mc-arr.a{background:linear-gradient(135deg,var(--blue),var(--violet));color:#fff;}
+.mc-arr.b{background:linear-gradient(135deg,var(--green),var(--teal));color:#fff;}
+
+/* ── SETUP ── */
+.setup-body{flex:1;padding:18px;overflow-y:auto;}
+.tip-box{border-radius:14px;padding:14px 16px;margin-bottom:20px;border:1.5px solid;}
+.tip-box.blue{background:var(--blue-l);border-color:var(--border2);}
+.tip-box.green{background:var(--green-l);border-color:#A7F3D0;}
+.tip-box p{font-size:13.5px;line-height:1.65;font-weight:500;}
+.tip-box.blue p{color:#4338CA;}.tip-box.green p{color:var(--green);}
+.tip-box strong{font-weight:800;}
+.sec-lbl{font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+.col-row{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px;}
+.col-card{min-width:90px;flex:1;background:var(--white);border:2px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.col-card.sel.blue{border-color:var(--blue);background:var(--blue-l);}
+.col-card.sel.green{border-color:var(--green);background:var(--green-l);}
+.col-card .ct{font-size:11px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.col-card.sel.blue .ct{color:var(--blue);}.col-card.sel.green .ct{color:var(--green);}
+.col-card .cs{font-size:10px;color:var(--text2);line-height:1.6;}
+.paste-box{background:var(--white);border:2px dashed var(--border2);border-radius:14px;padding:14px;margin-bottom:16px;transition:border-color .2s,border-style .2s;}
+.paste-box:focus-within.blue{border-style:solid;border-color:var(--blue);}
+.paste-box:focus-within.green{border-style:solid;border-color:var(--green);}
+.paste-box textarea{width:100%;min-height:140px;border:none;outline:none;font-family:'Nunito Sans',sans-serif;font-size:13px;color:var(--text);resize:none;line-height:1.6;background:transparent;}
+.paste-box textarea::placeholder{color:#CBD5E1;}
+.paste-hint{font-size:11px;color:#94A3B8;margin-top:6px;text-align:right;}
+.load-btn{width:100%;padding:17px;border:none;border-radius:14px;color:#fff;font-family:'Nunito',sans-serif;font-size:17px;font-weight:800;cursor:pointer;transition:all .15s;}
+.load-btn.blue{background:linear-gradient(135deg,var(--blue),var(--violet));box-shadow:0 6px 20px rgba(79,127,250,.3);}
+.load-btn.green{background:linear-gradient(135deg,var(--green),var(--teal));box-shadow:0 6px 20px rgba(5,150,105,.3);}
+.load-btn:active{transform:scale(.97);}
+.err-box{margin-top:12px;padding:11px 14px;background:var(--rose-l);border:1.5px solid #FECDD3;border-radius:12px;color:var(--rose);font-size:13px;font-weight:600;display:none;}
+
+/* ── WORK ── */
+.prog-strip{padding:12px 18px 10px;background:var(--white);border-bottom:1px solid var(--border);}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.prog-farmer{font-size:13px;font-weight:700;color:var(--text);}
+.prog-pct-txt{font-size:13px;color:var(--text2);font-weight:600;}
+.prog-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.prog-fill.blue{background:linear-gradient(90deg,var(--blue),var(--violet));}
+.prog-fill.green{background:linear-gradient(90deg,var(--green),var(--teal));}
+.work-body{flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+
+.rec-card{background:var(--white);border-radius:16px;border:1.5px solid var(--border);padding:14px 16px;box-shadow:var(--shadow);}
+.rec-primary{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:var(--text);margin-bottom:10px;line-height:1.2;}
+.rec-fields{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.rec-chip{border-radius:10px;padding:8px 11px;}
+.rc-lbl{font-size:10px;font-weight:700;margin-bottom:2px;}
+.rc-val{font-size:12.5px;font-weight:700;color:var(--text);word-break:break-all;}
+
+.pills-wrap{display:flex;gap:5px;flex-wrap:wrap;}
+.pill{flex:1;min-width:55px;padding:7px 4px;border-radius:20px;border:2px solid var(--border);text-align:center;font-size:10.5px;font-weight:800;color:var(--text3);background:var(--white);transition:all .25s;white-space:nowrap;}
+.pill.done{background:var(--green-l);border-color:#6EE7B7;color:var(--green);}
+
+.action-zone{flex:1;display:flex;flex-direction:column;gap:10px;justify-content:flex-end;}
+.val-box{background:var(--white);border-radius:14px;border:1.5px solid var(--border);padding:14px 16px;text-align:center;box-shadow:var(--shadow);}
+.vb-lbl{font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.vb-val{font-size:20px;font-weight:900;color:var(--text);word-break:break-all;line-height:1.25;font-family:'Nunito',sans-serif;}
+
+.copy-btn{width:100%;padding:19px 16px;border:none;border-radius:16px;font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;color:#fff;letter-spacing:.2px;}
+.copy-btn:active{transform:scale(.97);}
+.btn-inner{display:flex;align-items:center;justify-content:center;gap:10px;pointer-events:none;}
+.btn-ico{font-size:22px;}
+.btn-main{font-size:17px;font-weight:900;line-height:1;}
+.btn-hint{font-size:11px;font-weight:500;opacity:.75;margin-top:3px;}
+
+.status-line{text-align:center;font-size:12.5px;font-weight:600;color:var(--text3);min-height:18px;}
+.status-line.ok{color:var(--green);}
+
+.btm-nav{background:var(--white);border-top:1.5px solid var(--border);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;}
+.nav-btn{flex:1;padding:10px 6px;border:1.5px solid var(--border);border-radius:12px;background:var(--white);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;}
+.nav-btn:active{background:var(--bg2);}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+.nav-btn.danger{color:var(--rose);border-color:#FECDD3;}
+
+/* ── DONE ── */
+.done-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;}
+.done-ico{font-size:72px;margin-bottom:20px;animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{transform:scale(0);opacity:0}}
+.done-title{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--text);margin-bottom:8px;}
+.done-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:28px;font-weight:500;}
+.done-btns{display:flex;flex-direction:column;gap:10px;width:100%;}
+.done-main-btn{padding:15px;border:none;border-radius:14px;color:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;width:100%;}
+.done-main-btn.blue{background:linear-gradient(135deg,var(--blue),var(--violet));}
+.done-main-btn.green{background:linear-gradient(135deg,var(--green),var(--teal));}
+.done-home-btn{padding:13px;border:1.5px solid var(--border);border-radius:14px;background:var(--white);color:var(--text2);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;width:100%;}
+
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--text);color:#fff;font-family:'Nunito',sans-serif;font-size:13.5px;font-weight:700;padding:10px 20px;border-radius:30px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@keyframes rpl{to{transform:scale(5);opacity:0}}
+.rpl{position:absolute;border-radius:50%;background:rgba(255,255,255,.25);width:60px;height:60px;margin:-30px 0 0 -30px;animation:rpl .55s linear;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- SPLASH -->
+<div class="screen active" id="s-splash">
+  <div class="spl-wrap">
+    <div class="spl-ico"><img src="icon-192.png" style="width:72px;height:72px;border-radius:16px;object-fit:cover;"/></div>
+    <div>
+      <div class="spl-title">SHC Assistant</div>
+      <div class="spl-sub">Farmer Registration &amp;<br/>Plot Management</div>
+    </div>
+    <div class="spl-dots"><div class="spl-dot"></div><div class="spl-dot"></div><div class="spl-dot"></div></div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="s-home">
+  <div class="header">
+    <div class="hdr-ico blue">🌾</div>
+    <div>
+      <div class="hdr-title">SHC Assistant</div>
+      <div class="hdr-sub">Select a module to begin</div>
+    </div>
+  </div>
+  <div class="home-body">
+    <div class="home-greet-title">Welcome 👋</div>
+    <div class="home-greet-sub">Choose a module below to start copying data into the SHC app.</div>
+    <div class="mod-cards">
+      <div class="mod-card ca" onclick="openModule('a')">
+        <div class="mc-top">
+          <div class="mc-ico a">👨‍🌾</div>
+          <div class="mc-info">
+            <div class="mc-title">Farmer Registration</div>
+            <div class="mc-desc">Register farmers one by one. Auto-copies Name, Mobile, Aadhar and Address in sequence.</div>
+          </div>
+        </div>
+        <div class="mc-tags">
+          <span class="mc-tag a">👤 Name</span><span class="mc-tag a">📱 Mobile</span><span class="mc-tag a">🪪 Aadhar</span><span class="mc-tag a">📍 Address</span>
+        </div>
+      </div>
+      <div class="mod-card cb" onclick="openModule('b')">
+        <div class="mc-top">
+          <div class="mc-ico b">📍</div>
+          <div class="mc-info">
+            <div class="mc-title">Add Plot</div>
+            <div class="mc-desc">Add plot details for each farmer. Auto-copies Mobile, Survey No., Area and fertilizer quantities.</div>
+          </div>
+        </div>
+        <div class="mc-tags">
+          <span class="mc-tag b">📱 Mobile</span><span class="mc-tag b">📋 Survey No.</span><span class="mc-tag b">📐 Area</span><span class="mc-tag b">🌱 Fert. Before</span><span class="mc-tag b">🌿 Fert. After</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="screen" id="s-setup">
+  <div class="header">
+    <div class="hdr-ico" id="sh-ico"></div>
+    <div>
+      <div class="hdr-title" id="sh-title"></div>
+      <div class="hdr-sub">Paste your Excel data</div>
+    </div>
+    <div class="hdr-right"><button class="back-btn" onclick="goHome()">← Home</button></div>
+  </div>
+  <div class="setup-body">
+    <div class="tip-box" id="tip-box"><p id="tip-txt"></p></div>
+    <div class="sec-lbl">Column order in your Excel</div>
+    <div class="col-row" id="col-row"></div>
+    <div class="sec-lbl">Paste Excel Data</div>
+    <div class="paste-box" id="paste-box">
+      <textarea id="raw" placeholder=""></textarea>
+      <div class="paste-hint">Tab or Comma separated columns</div>
+    </div>
+    <button class="load-btn" id="load-btn" onclick="loadData()">Load Data &amp; Start →</button>
+    <div class="err-box" id="err-box"></div>
+  </div>
+</div>
+
+<!-- WORK -->
+<div class="screen" id="s-work">
+  <div class="header">
+    <div class="hdr-ico" id="wh-ico"></div>
+    <div>
+      <div class="hdr-title" id="wh-title"></div>
+      <div class="hdr-sub" id="wh-sub"></div>
+    </div>
+    <div class="hdr-right"><div class="hdr-badge" id="w-pct">0%</div></div>
+  </div>
+  <div class="prog-strip">
+    <div class="prog-row">
+      <span class="prog-farmer" id="pg-rec"></span>
+      <span class="prog-pct-txt" id="pg-pct"></span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="pg-fill" style="width:0%"></div></div>
+  </div>
+  <div class="work-body">
+    <div class="rec-card">
+      <div class="rec-primary" id="rec-primary">—</div>
+      <div class="rec-fields" id="rec-fields"></div>
+    </div>
+    <div class="pills-wrap" id="pills-wrap"></div>
+    <div class="action-zone">
+      <div class="val-box">
+        <div class="vb-lbl" id="vb-lbl">NOW COPYING</div>
+        <div class="vb-val" id="vb-val">—</div>
+      </div>
+      <button class="copy-btn" id="copy-btn" onclick="doAction(event)">
+        <div class="btn-inner">
+          <span class="btn-ico" id="btn-ico">📋</span>
+          <div>
+            <div class="btn-main" id="btn-main">Copy</div>
+            <div class="btn-hint">Tap → paste in SHC → tap again</div>
+          </div>
+        </div>
+      </button>
+      <div class="status-line" id="status-line">Tap to copy, then paste in SHC app</div>
+    </div>
+  </div>
+  <div class="btm-nav">
+    <button class="nav-btn" id="btn-back" onclick="goBack()" disabled>← Back</button>
+    <button class="nav-btn" onclick="goHome()">🏠 Home</button>
+    <button class="nav-btn danger" onclick="if(confirm('Restart this module?'))restartMod()">↺ Restart</button>
+  </div>
+</div>
+
+<!-- DONE -->
+<div class="screen" id="s-done">
+  <div class="header">
+    <div class="hdr-ico" id="dh-ico"></div>
+    <div><div class="hdr-title" id="dh-title">Done!</div><div class="hdr-sub">All records complete</div></div>
+    <div class="hdr-right"><div class="hdr-badge">100%</div></div>
+  </div>
+  <div class="done-body">
+    <div class="done-ico">🎉</div>
+    <div class="done-title" id="done-title">All Done!</div>
+    <div class="done-sub" id="done-sub">All records processed successfully.</div>
+    <div class="done-btns">
+      <button class="done-main-btn" id="done-restart-btn" onclick="restartMod()">Start Again →</button>
+      <button class="done-home-btn" onclick="goHome()">🏠 Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   CONFIG — Add/edit fields here only
+══════════════════════════════════════════ */
+const MODULES = {
+  a: {
+    id:'a', name:'Farmer Registration', icon:'👨‍🌾', color:'blue',
+    recLabel:'Farmer', primaryField:0,
+    tipText:'Paste your Excel farmer data. The button auto-copies each field in sequence:',
+    placeholder:'Ramesh Kumar\t9876543210\t123456789012\tVehale\nSuresh Patil\t9123456789\t234567890123\tVehale',
+    fields:[
+      {key:'name',     label:'Name',                icon:'👤', chipBg:'#EEF2FF', chipBd:'#C7D2FE', chipLbl:'#4F46E5', grad:['#4F7FFA','#7C5CF6'], shadow:'rgba(79,127,250,.35)',  lbl:'#4F46E5'},
+      {key:'mobile',   label:'Mobile Number',       icon:'📱', chipBg:'#ECFDF5', chipBd:'#A7F3D0', chipLbl:'#059669', grad:['#059669','#34D399'], shadow:'rgba(5,150,105,.3)',    lbl:'#059669'},
+      {key:'aadhar',   label:'Aadhar Number',       icon:'🪪', chipBg:'#FFFBEB', chipBd:'#FDE68A', chipLbl:'#D97706', grad:['#D97706','#FBBF24'], shadow:'rgba(217,119,6,.3)',    lbl:'#D97706'},
+      {key:'address',  label:'Address',             icon:'📍', chipBg:'#F0F4FF', chipBd:'#C7D2FE', chipLbl:'#4F46E5', grad:['#4F46E5','#818CF8'], shadow:'rgba(79,70,229,.3)',    lbl:'#4F46E5', wide:true},
+    ],
+    colOrders:[
+      {label:'Order 1', desc:'Name\nMobile\nAadhar\nAddress',  map:[0,1,2,3]},
+      {label:'Order 2', desc:'Name\nMobile\nAddress\nAadhar',  map:[0,1,3,2]},
+      {label:'Order 3', desc:'Name\nAadhar\nMobile\nAddress',  map:[0,2,1,3]},
+    ]
+  },
+  b: {
+    id:'b', name:'Add Plot', icon:'📍', color:'green',
+    recLabel:'Plot', primaryField:0,
+    tipText:'Paste your Excel plot data. The button auto-copies each field in sequence:',
+    placeholder:'9876543210\tSvy-101\t2.5\t50\t75\n9123456789\tSvy-102\t1.8\t30\t60',
+    fields:[
+      {key:'mobile',     label:'Mobile Number',           icon:'📱', chipBg:'#ECFDF5', chipBd:'#A7F3D0', chipLbl:'#059669', grad:['#059669','#34D399'], shadow:'rgba(5,150,105,.3)',    lbl:'#059669'},
+      {key:'survey',     label:'Survey Number',           icon:'📋', chipBg:'#F0FDFA', chipBd:'#99F6E4', chipLbl:'#0D9488', grad:['#0D9488','#2DD4BF'], shadow:'rgba(13,148,136,.3)',   lbl:'#0D9488'},
+      {key:'area',       label:'Area',                   icon:'📐', chipBg:'#FFFBEB', chipBd:'#FDE68A', chipLbl:'#D97706', grad:['#D97706','#FBBF24'], shadow:'rgba(217,119,6,.3)',    lbl:'#D97706'},
+      {key:'fertbefore', label:'Fertilizer Used Before',  icon:'🌱', chipBg:'#F0FDF4', chipBd:'#BBF7D0', chipLbl:'#16A34A', grad:['#16A34A','#4ADE80'], shadow:'rgba(22,163,74,.3)',    lbl:'#16A34A'},
+      {key:'fertafter',  label:'Fertilizer Used After',   icon:'🌿', chipBg:'#ECFDF5', chipBd:'#6EE7B7', chipLbl:'#059669', grad:['#4F46E5','#818CF8'], shadow:'rgba(79,70,229,.3)',    lbl:'#4F46E5', wide:true},
+    ],
+    colOrders:[
+      {label:'Order 1', desc:'Mobile\nSurvey No.\nArea\nFert.Before\nFert.After', map:[0,1,2,3,4]},
+      {label:'Order 2', desc:'Mobile\nArea\nSurvey No.\nFert.Before\nFert.After', map:[0,2,1,3,4]},
+      {label:'Order 3', desc:'Survey No.\nMobile\nArea\nFert.Before\nFert.After', map:[1,0,2,3,4]},
+    ]
+  }
+};
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let M=null, records=[], ri=0, step=0, colMap=[];
+
+/* ══════════════════════════════════════════
+   SPLASH
+══════════════════════════════════════════ */
+window.addEventListener('load',()=>setTimeout(()=>show('home'),2200));
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function show(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s-'+n).classList.add('active');}
+function goHome(){records=[];ri=0;step=0;M=null;show('home');}
+
+/* ══════════════════════════════════════════
+   OPEN MODULE → BUILD SETUP UI
+══════════════════════════════════════════ */
+function openModule(id){
+  M=MODULES[id];const c=M.color;
+  // Header
+  document.getElementById('sh-ico').textContent=M.icon;
+  document.getElementById('sh-ico').className='hdr-ico '+c;
+  document.getElementById('sh-title').textContent=M.name;
+  // Tip
+  document.getElementById('tip-box').className='tip-box '+c;
+  document.getElementById('tip-txt').innerHTML=M.tipText+' <strong>'+M.fields.map(f=>f.icon+' '+f.label.split(' ')[0]).join(' → ')+'</strong>';
+  // Col orders
+  colMap=M.colOrders[0].map;
+  const cr=document.getElementById('col-row');cr.innerHTML='';
+  M.colOrders.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='col-card'+(i===0?' sel '+c:'');
+    d.innerHTML=`<div class="ct">${o.label}</div><div class="cs">${o.desc.replace(/\n/g,'<br/>')}</div>`;
+    d.onclick=()=>{document.querySelectorAll('.col-card').forEach(e=>e.classList.remove('sel','blue','green'));d.classList.add('sel',c);colMap=o.map;};
+    cr.appendChild(d);
+  });
+  // Paste
+  document.getElementById('paste-box').className='paste-box '+c;
+  document.getElementById('raw').placeholder=M.placeholder;
+  document.getElementById('raw').value='';
+  document.getElementById('load-btn').className='load-btn '+c;
+  document.getElementById('err-box').style.display='none';
+  show('setup');
+}
+
+/* ══════════════════════════════════════════
+   LOAD DATA
+══════════════════════════════════════════ */
+function loadData(){
+  const raw=document.getElementById('raw').value.trim();
+  if(!raw){showErr('Please paste your Excel data first.');return;}
+  const lines=raw.split('\n').filter(l=>l.trim());
+  const parsed=[];
+  for(let line of lines){
+    const cols=line.split(/\t|,|;/).map(s=>s.trim()).filter(s=>s);
+    if(cols.length<M.fields.length)continue;
+    const rec={};
+    M.fields.forEach((f,fi)=>{rec[f.key]=cols[colMap[fi]]||'';});
+    parsed.push(rec);
+  }
+  if(!parsed.length){showErr('Could not read data. Need at least '+M.fields.length+' columns per row.');return;}
+  records=parsed;ri=0;step=0;
+  document.getElementById('err-box').style.display='none';
+  buildWorkUI();show('work');render();
+}
+function showErr(m){const e=document.getElementById('err-box');e.textContent=m;e.style.display='block';}
+
+/* ══════════════════════════════════════════
+   BUILD WORK UI (from config)
+══════════════════════════════════════════ */
+function buildWorkUI(){
+  const c=M.color;
+  document.getElementById('wh-ico').textContent=M.icon;
+  document.getElementById('wh-ico').className='hdr-ico '+c;
+  document.getElementById('wh-title').textContent=M.name;
+  document.getElementById('pg-fill').className='prog-fill '+c;
+  // Pills
+  const pw=document.getElementById('pills-wrap');pw.innerHTML='';
+  M.fields.forEach((f,i)=>{
+    const p=document.createElement('div');p.className='pill';p.id='pill-'+i;
+    p.textContent=f.icon+' '+f.label.split(' ')[0];pw.appendChild(p);
+  });
+  // Done header
+  document.getElementById('dh-ico').textContent=M.icon;
+  document.getElementById('dh-ico').className='hdr-ico '+c;
+  document.getElementById('dh-title').textContent=M.name+' — Done!';
+  document.getElementById('done-restart-btn').className='done-main-btn '+c;
+}
+
+/* ══════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════ */
+function render(){
+  const rec=records[ri];const f=M.fields[step];const tot=M.fields.length;
+  // Progress
+  const pct=Math.round(((ri*tot+step)/(records.length*tot))*100);
+  document.getElementById('wh-sub').textContent=M.recLabel+' '+(ri+1)+' of '+records.length;
+  document.getElementById('w-pct').textContent=pct+'%';
+  document.getElementById('pg-rec').textContent=M.recLabel+' '+(ri+1)+' of '+records.length;
+  document.getElementById('pg-pct').textContent=pct+'% complete';
+  document.getElementById('pg-fill').style.width=pct+'%';
+  document.getElementById('btn-back').disabled=(ri===0&&step===0);
+  // Primary
+  document.getElementById('rec-primary').textContent=rec[M.fields[M.primaryField].key]||'—';
+  // Chips
+  const rf=document.getElementById('rec-fields');rf.innerHTML='';
+  M.fields.forEach((fd,i)=>{
+    if(i===M.primaryField)return;
+    const chip=document.createElement('div');chip.className='rec-chip';
+    chip.style.cssText=`background:${fd.chipBg};border:1.5px solid ${fd.chipBd};`+(fd.wide?'grid-column:span 2;':'');
+    chip.innerHTML=`<div class="rc-lbl" style="color:${fd.chipLbl}">${fd.icon} ${fd.label}</div><div class="rc-val">${rec[fd.key]||'—'}</div>`;
+    rf.appendChild(chip);
+  });
+  // Pills
+  M.fields.forEach((fd,i)=>{
+    const p=document.getElementById('pill-'+i);if(!p)return;
+    p.className='pill';
+    p.textContent=(i<step?'✓ ':fd.icon+' ')+fd.label.split(' ')[0];
+    if(i<step){p.classList.add('done');p.style.background='';p.style.borderColor='';p.style.color='';}
+    else if(i===step){p.style.background=fd.chipBg;p.style.borderColor=fd.chipBd;p.style.color=fd.lbl;}
+    else{p.style.background='';p.style.borderColor='';p.style.color='';}
+  });
+  // Value box
+  document.getElementById('vb-lbl').textContent='NOW COPYING — '+f.label.toUpperCase();
+  document.getElementById('vb-lbl').style.color=f.lbl;
+  document.getElementById('vb-val').textContent=rec[f.key]||'—';
+  document.getElementById('vb-val').style.color=f.lbl;
+  // Button
+  const btn=document.getElementById('copy-btn');
+  btn.style.background=`linear-gradient(135deg,${f.grad[0]},${f.grad[1]})`;
+  btn.style.boxShadow=`0 6px 22px ${f.shadow}`;
+  document.getElementById('btn-ico').textContent=f.icon;
+  document.getElementById('btn-main').textContent='Copy '+f.label;
+  document.getElementById('status-line').textContent='Tap to copy, then paste in SHC app';
+  document.getElementById('status-line').className='status-line';
+}
+
+/* ══════════════════════════════════════════
+   ACTIONS
+══════════════════════════════════════════ */
+function doAction(e){
+  const rec=records[ri];const f=M.fields[step];const val=rec[f.key]||'';
+  addRipple(e,document.getElementById('copy-btn'));
+  const ok=()=>{
+    showToast(f.icon+'  '+f.label+' Copied!');
+    document.getElementById('status-line').textContent='Copied! Paste in SHC app, then tap again';
+    document.getElementById('status-line').className='status-line ok';
+    advance();
+  };
+  navigator.clipboard.writeText(val).then(ok).catch(()=>{
+    try{const t=document.createElement('textarea');t.value=val;t.style.cssText='position:fixed;opacity:0;top:0;left:0;';document.body.appendChild(t);t.focus();t.select();document.execCommand('copy');document.body.removeChild(t);ok();}
+    catch{prompt('Copy this value:',val);advance();}
+  });
+}
+
+function advance(){
+  setTimeout(()=>{
+    if(step<M.fields.length-1){step++;render();}
+    else if(ri<records.length-1){ri++;step=0;render();}
+    else{
+      document.getElementById('done-title').textContent='All '+records.length+' '+M.recLabel+'s Done!';
+      document.getElementById('done-sub').textContent='All '+records.length+' '+M.name.toLowerCase()+' records processed successfully.';
+      show('done');
+    }
+  },120);
+}
+
+function goBack(){
+  if(step>0){step--;render();}
+  else if(ri>0){ri--;step=M.fields.length-1;render();}
+}
+
+function restartMod(){records=[];ri=0;step=0;openModule(M.id);}
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function addRipple(e,btn){const r=document.createElement('span');r.className='rpl';const rc=btn.getBoundingClientRect();r.style.left=((e.clientX||rc.left+rc.width/2)-rc.left)+'px';r.style.top=((e.clientY||rc.top+rc.height/2)-rc.top)+'px';btn.appendChild(r);setTimeout(()=>r.remove(),600);}
+
+/* SERVICE WORKER */
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
